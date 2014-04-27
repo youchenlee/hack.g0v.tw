@@ -249,6 +249,15 @@ angular.module 'app.controllers' <[ui.state ngCookies]>
       cb folder-title, docs, tree
 
     load-csv: (csv, docs, tree, cb) ->
+      # Handle configs
+      config-match-arr = []
+      # TODO match only top line / top few lines to enhance performance
+      config-lines = csv.match /^\"?#@.*/gm
+      for line in config-lines?
+        config-match-arr ++= [element.match /^#?@(\w+)=(.*)/ for element in line.split ',' when element is not "" ]
+      for config-match in config-match-arr when config-match
+        @handle-config config-match.1, config-match.2
+
       csv -= /^\"?#.*\n/gm
       var folder-title
       folder-opts = {}
@@ -352,3 +361,9 @@ angular.module 'app.controllers' <[ui.state ngCookies]>
         it
       tree.splice 0, tree.length, ...nested
       cb folder-title, docs
+
+    handle-config: (key, val) ->
+      switch key
+      | \collapsed
+        ...
+        #$scope.collapsed = $cookies.collapsed ? (val? is true)
